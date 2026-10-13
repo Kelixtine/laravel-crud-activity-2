@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Product List</title>
 
     <style>
@@ -31,6 +32,7 @@
             align-items: center;
             margin-bottom: 25px;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .header h1 {
@@ -43,21 +45,40 @@
             color: #94a3b8;
         }
 
-        .add-btn {
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .add-btn, .logout-btn {
             display: inline-block;
             padding: 12px 18px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             text-decoration: none;
+            border: none;
             border-radius: 10px;
             font-weight: bold;
-            transition: 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
 
         .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.45);
+            background: #4f46e5;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
         }
 
         .success {
@@ -73,7 +94,7 @@
             background: rgba(30, 41, 59, 0.85);
             border: 1px solid rgba(148, 163, 184, 0.15);
             border-radius: 16px;
-            overflow: hidden;
+            overflow-x: auto;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
         }
 
@@ -96,10 +117,6 @@
             padding: 16px;
             border-bottom: 1px solid rgba(148, 163, 184, 0.1);
             color: #e2e8f0;
-        }
-
-        tbody tr {
-            transition: 0.2s;
         }
 
         tbody tr:hover {
@@ -162,12 +179,8 @@
             }
 
             .header {
-                flex-direction: column;
                 align-items: flex-start;
-            }
-
-            .table-card {
-                overflow-x: auto;
+                flex-direction: column;
             }
 
             table {
@@ -178,7 +191,6 @@
 </head>
 
 <body>
-
 <div class="container">
 
     <div class="header">
@@ -187,9 +199,18 @@
             <p>Manage your products easily</p>
         </div>
 
-        <a href="{{ route('products.create') }}" class="add-btn">
-            + Add New Product
-        </a>
+        <div class="header-actions">
+            <a href="{{ route('products.create') }}" class="add-btn">
+                + Add New Product
+            </a>
+
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    Log Out
+                </button>
+            </form>
+        </div>
     </div>
 
     @if(session('success'))
@@ -199,7 +220,6 @@
     @endif
 
     <div class="table-card">
-
         <table>
             <thead>
                 <tr>
@@ -213,29 +233,17 @@
             </thead>
 
             <tbody>
-
                 @forelse($products as $product)
-
                     <tr>
                         <td>{{ $product->id }}</td>
-
-                        <td>
-                            <strong>{{ $product->name }}</strong>
-                        </td>
-
+                        <td><strong>{{ $product->name }}</strong></td>
                         <td>{{ $product->qty }}</td>
-
                         <td class="price">
                             ₱{{ number_format($product->price, 2) }}
                         </td>
-
-                        <td>
-                            {{ $product->description }}
-                        </td>
-
+                        <td>{{ $product->description }}</td>
                         <td>
                             <div class="actions">
-
                                 <a href="{{ route('products.edit', $product->id) }}"
                                    class="edit">
                                     Edit
@@ -243,25 +251,18 @@
 
                                 <form action="{{ route('products.destroy', $product->id) }}"
                                       method="POST"
-                                      style="display:inline;">
-
+                                      onsubmit="return confirm('Delete this product?')">
                                     @csrf
                                     @method('DELETE')
 
-                                    <button type="submit"
-                                            class="delete"
-                                            onclick="return confirm('Delete this product?')">
+                                    <button type="submit" class="delete">
                                         Delete
                                     </button>
-
                                 </form>
-
                             </div>
                         </td>
                     </tr>
-
                 @empty
-
                     <tr>
                         <td colspan="6" class="empty">
                             📭 No products found.
@@ -269,15 +270,11 @@
                             Click "Add New Product" to create one.
                         </td>
                     </tr>
-
                 @endforelse
-
             </tbody>
         </table>
-
     </div>
 
 </div>
-
 </body>
 </html>
