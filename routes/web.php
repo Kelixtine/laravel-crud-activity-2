@@ -1,27 +1,26 @@
-
 <?php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect the homepage to the Products page
+// Redirect the homepage to the Products page.
 Route::get('/', function () {
     return redirect()->route('products.index');
 });
 
-// Protect routes so only authenticated users can access them
+// Routes accessible only to authenticated users.
 Route::middleware('auth')->group(function () {
 
-    // Product CRUD routes
+    // Product CRUD routes.
     Route::resource('products', ProductController::class);
 
-    // Dashboard route
+    // Dashboard route.
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->middleware('verified')->name('dashboard');
+    })->name('dashboard');
 
-    // Profile routes
+    // Profile routes.
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
@@ -32,5 +31,5 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 });
 
-// Load Laravel Breeze authentication routes
+// Load authentication routes.
 require __DIR__.'/auth.php';
