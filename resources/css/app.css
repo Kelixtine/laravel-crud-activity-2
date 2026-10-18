@@ -1,3 +1,100 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ========================================
+   LITTLE BAKERY THEME
+   Butter yellow, sage green & warm cream
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+
+:root {
+    --bakery-cream: #FFF9E9;
+    --bakery-yellow: #F8D978;
+    --bakery-yellow-light: #FFF0B8;
+    --bakery-sage: #A9B987;
+    --bakery-sage-dark: #70864E;
+    --bakery-brown: #694B2D;
+    --bakery-muted: #927B5C;
+    --bakery-white: #FFFEF8;
+    --bakery-border: #E8DDBD;
+    --bakery-shadow: 0 8px 24px rgba(105, 75, 45, 0.08);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bakery-cream);
+    color: var(--bakery-brown);
+    font-family: 'Nunito', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--bakery-brown);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+}
+
+input, select, textarea {
+    border-color: var(--bakery-border) !important;
+    border-radius: 12px !important;
+    color: var(--bakery-brown) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--bakery-sage-dark) !important;
+    box-shadow: 0 0 0 3px rgba(169, 185, 135, 0.22) !important;
+    outline: none;
+}
+
+.bakery-card {
+    background: var(--bakery-white);
+    border: 1px solid var(--bakery-border);
+    border-radius: 20px;
+    box-shadow: var(--bakery-shadow);
+    padding: 24px;
+}
+
+.bakery-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 999px;
+    background: var(--bakery-sage-dark);
+    color: white;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.bakery-button:hover {
+    background: var(--bakery-brown);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.bakery-button-yellow {
+    background: var(--bakery-yellow);
+    color: var(--bakery-brown);
+}
+
+.bakery-button-yellow:hover {
+    background: #EBC65B;
+    color: var(--bakery-brown);
+}
+
+.bakery-muted {
+    color: var(--bakery-muted);
+}
+
+::selection {
+    background: var(--bakery-yellow-light);
+    color: var(--bakery-brown);
+}
