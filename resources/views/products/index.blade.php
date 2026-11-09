@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,9 +200,11 @@
         </div>
 
         <div class="header-actions">
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('products.create') }}" class="add-btn">
                 + Add New Product
             </a>
+            @endif
 
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
@@ -219,16 +221,30 @@
         </div>
     @endif
 
+        <form action="{{ route('products.index') }}" method="GET" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="Search products by name..."
+            style="flex:1; min-width:200px; padding:12px; border-radius:9px; border:1px solid #475569; background:#0f172a; color:white;"
+        >
+        <button type="submit" class="add-btn">Search</button>
+        <a href="{{ route('products.index') }}" class="logout-btn" style="padding:12px; text-decoration:none; border-radius:9px;">Clear</a>
+    </form>
     <div class="table-card">
         <table>
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Image</th>
                     <th>Name</th>
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Description</th>
+                    @if(auth()->user()->role === 'admin')
                     <th>Actions</th>
+                    @endif
                 </tr>
             </thead>
 
@@ -236,12 +252,20 @@
                 @forelse($products as $product)
                     <tr>
                         <td>{{ $product->id }}</td>
+                        <td>
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="Product Image" style="width:65px; height:65px; object-fit:cover; border-radius:8px;">
+                            @else
+                                No image
+                            @endif
+                        </td>
                         <td><strong>{{ $product->name }}</strong></td>
                         <td>{{ $product->qty }}</td>
                         <td class="price">
                             ₱{{ number_format($product->price, 2) }}
                         </td>
                         <td>{{ $product->description }}</td>
+                        @if(auth()->user()->role === 'admin')
                         <td>
                             <div class="actions">
                                 <a href="{{ route('products.edit', $product->id) }}"
@@ -261,10 +285,11 @@
                                 </form>
                             </div>
                         </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="empty">
+                        <td colspan="{{ auth()->user()->role === 'admin' ? 7 : 6 }}" class="empty">
                             📭 No products found.
                             <br>
                             Click "Add New Product" to create one.
@@ -275,6 +300,9 @@
         </table>
     </div>
 
+    <div style="margin-top:20px;">
+        {{ $products->links() }}
+    </div>
 </div>
 </body>
 </html>

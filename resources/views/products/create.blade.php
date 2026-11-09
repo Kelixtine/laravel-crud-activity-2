@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -149,7 +149,7 @@
             </div>
         @endif
 
-        <form action="{{ route('products.store') }}" method="POST">
+        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
 
             @csrf
 
@@ -221,6 +221,20 @@
                 @enderror
             </div>
 
+            <div class="form-group">
+                <label for="image">Product Image (JPEG, JPG, PNG, WebP - Max 2 MB)</label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                >
+
+                @error('image')
+                    <div class="error">{{ $message }}</div>
+                @enderror
+            </div>
             <div class="buttons">
 
                 <button type="submit" class="save-btn">

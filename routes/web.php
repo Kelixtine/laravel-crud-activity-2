@@ -4,23 +4,38 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect the homepage to the Products page.
 Route::get('/', function () {
     return redirect()->route('products.index');
 });
 
-// Routes accessible only to authenticated users.
 Route::middleware('auth')->group(function () {
 
-    // Product CRUD routes.
-    Route::resource('products', ProductController::class);
+    // All authenticated users can view products.
+    Route::get('/products', [ProductController::class, 'index'])
+        ->name('products.index');
 
-    // Dashboard route.
+    // Only administrators can manage products.
+    Route::middleware('admin')->group(function () {
+        Route::get('/products/create', [ProductController::class, 'create'])
+            ->name('products.create');
+
+        Route::post('/products', [ProductController::class, 'store'])
+            ->name('products.store');
+
+        Route::get('/products/{product}/edit', [ProductController::class, 'edit'])
+            ->name('products.edit');
+
+        Route::put('/products/{product}', [ProductController::class, 'update'])
+            ->name('products.update');
+
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])
+            ->name('products.destroy');
+    });
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
 
-    // Profile routes.
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
@@ -31,5 +46,4 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 });
 
-// Load authentication routes.
 require __DIR__.'/auth.php';

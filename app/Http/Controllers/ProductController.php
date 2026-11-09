@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $query = Product::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->latest()->paginate(10)->withQueryString();
 
         return view('products.index', compact('products'));
     }
@@ -21,15 +28,20 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'qty' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ]);
 
-        Product::create(
-            $request->only('name', 'qty', 'price', 'description')
-        );
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')
+                ->store('products', 'public');
+        }
+
+        Product::create($validated);
 
         return redirect()
             ->route('products.index')
@@ -45,17 +57,31 @@ class ProductController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'qty' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ]);
 
         $product = Product::findOrFail($id);
+        $oldImage = $product->image;
+        $newImage = null;
 
-        $product->update(
-            $request->only('name', 'qty', 'price', 'description')
-        );
+        if ($request->hasFile('image')) {
+            $newImage = $request->file('image')
+                ->store('products', 'public');
+
+            $validated['image'] = $newImage;
+        }
+
+        $product->update($validated);
+
+        // Delete the old image only after the update succeeds.
+        if ($newImage && $oldImage) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()
             ->route('products.index')
@@ -65,7 +91,13 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         $product = Product::findOrFail($id);
+        $image = $product->image;
+
         $product->delete();
+
+        if ($image) {
+            Storage::disk('public')->delete($image);
+        }
 
         return redirect()
             ->route('products.index')

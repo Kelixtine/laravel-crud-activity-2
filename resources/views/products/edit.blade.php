@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -149,7 +149,7 @@
             </div>
         @endif
 
-        <form action="{{ route('products.update', $product->id) }}" method="POST">
+        <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
 
             @csrf
             @method('PUT')
@@ -222,6 +222,34 @@
                 @enderror
             </div>
 
+            <div class="form-group">
+                <label>Current Product Image</label>
+
+                @if ($product->image)
+                    <div style="margin-bottom: 12px;">
+                        <img
+                            src="{{ asset('storage/' . $product->image) }}"
+                            alt="Product Image"
+                            style="max-width: 200px; max-height: 200px; border-radius: 10px;"
+                        >
+                    </div>
+                @else
+                    <p>No image uploaded yet.</p>
+                @endif
+
+                <label for="image">Choose a Replacement Image (Optional)</label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                >
+
+                @error('image')
+                    <div class="error">{{ $message }}</div>
+                @enderror
+            </div>
             <div class="buttons">
 
                 <button type="submit" class="update-btn">
